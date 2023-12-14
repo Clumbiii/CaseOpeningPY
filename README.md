@@ -1,21 +1,21 @@
 **CASEOPENING - ONLY WITH PYTHON 3.11.6**
-    [WEBSEITEN-SIND-NICHT-RESPONSIVE]
+            [NOT RESPONSIVE]
 
-# Libraries Installieren
+# Install libraries
 `pip install -r requirements.txt`
 `cd flask`
 
-# CaseOpening Starten
+# Start CaseOpening
 `python3 app.py`
 
-# SQL-Datei
-Importiere nun die Datei 'testuser.sql'.
+# SQL file
+Import the file 'testuser.sql'.
 
-# Demo-Account
-Benutzername: `demo`
-Passwort: `syntaxerror123`
+# Demo accountdetails
+username: `demo`
+password: `syntaxerror123`
 
-# Neuen Hash-Key Generieren (Passwort)
-=> Gehe dazu in "generator.py" und schreibe dein Passwort in "your_password"
-=> Beispiel: your_password = "syntaxerror123"
+# Generate new hash (password)
+=> Go to "generator.py" and type your password into the string "your_password"
+=> example: your_password = "syntaxerror123"
 `python3 generator.py`
