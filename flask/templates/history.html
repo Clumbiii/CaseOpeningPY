@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block meta %}
+    <link rel="stylesheet" href="/static/history.css"/>
+{% endblock %}
+{% block content %}
+
+{% if login %}
+<script type="text/javascript">
+    /* page reload */
+    document.addEventListener('DOMContentLoaded', function () {
+        if(getCookie('session_color') == 'default') return;
+
+        changeBGColor();
+    });
+
+    /* change the color of the elements */
+    function changeBGColor() {
+        var itemColor = getCookie('session_color');
+
+        $(".banner-slogan-title").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 47) + ')');
+        $(".banner-slogan-title").css('-webkit-background-clip', 'text');
+        $(".banner-slogan-title").css('-webkit-text-fill-color', 'transparent');
+        
+        $(".login-button-box").css('border', '2px solid ' + itemColor);
+        $(".login-button-box").css('background', +LightenDarkenColor(itemColor, 47));
+
+        document.documentElement.style.setProperty('--nav-a-hover', itemColor);
+
+        $(".navMenu a.nav-active").css('border-bottom', '3px solid ' + itemColor);
+        $(".navMenu a.nav-active").css('background', 'linear-gradient(180deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 90%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 100%)');
+        
+        $(".hud-title").css('color', LightenDarkenColor(itemColor, 77));
+        
+        $(".history-row-id").css('color', LightenDarkenColor(itemColor, 77));
+    }
+
+    /* rgb functions */
+    function getG(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[2], 16);
+    }
+
+    function getR(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[1], 16);
+    }
+
+    function getB(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[3], 16);
+    }
+
+    /* method to fade */
+    function LightenDarkenColor(col, amt) {
+        var usePound = false;
+        if (col[0] == "#") {
+          col = col.slice(1);
+          usePound = true;
+        }
+
+        var num = parseInt(col, 16);
+
+        var r = (num >> 16) + amt;
+
+        if (r > 255) r = 255;
+        else if (r < 0) r = 0;
+
+        var b = ((num >> 8) & 0x00FF) + amt;
+
+        if (b > 255) b = 255;
+        else if (b < 0) b = 0;
+
+        var g = (num & 0x0000FF) + amt;
+
+        if (g > 255) g = 255;
+        else if (g < 0) g = 0;
+
+        return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+
+    /* get current coockie (session_code or session_color) */
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+</script>
+
+<section class="history-page">
+    <div id="BG">
+        <div id="bgdesign" class="main-box">
+            <div class="banner-slogan">
+                <span class="banner-slogan-title">CaseOpening</span>
+                <span class="banner-slogan-subtitle">Gewinne exklusive Fahrzeuge</span>
+            </div>
+
+            <nav class="navMenu">
+                <a href="/spin">Drehen</a>
+                <!--<a href="/shop">Kaufen</a>-->
+                <a href="/history" class="nav-active">Überblick</a>
+                <a href="/settings/{{profil_info[0]}}">{{profil_info[2]}}</a>
+            </nav>
+
+            <div class="structure-line"></div>
+            <div class="player-normalcrates-hud">
+                <span class="player-normalcrates-hud-title">Deine Truhen:</span>
+                <span class="player-normalcrates-hud-subtitle hud-title">{{profil_info[6]}}</span>
+            </div>
+
+            <div class="history-tables">
+                {% if entries != None %}
+                    {% for entry in entries %}
+                        <div class="history-row">
+                            <h2 class="history-row-id"># {{ entry[0] }}</p>
+                            <h2>{{ entry[1] }}</p>
+                            <h2>{{ entry[2] }}</p>
+                            <h2>{{ entry[4] }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-entries-found-box">
+                        <i class="fa-icon"></i>
+
+                        <h1>Kein Verlauf Verfügbar</h1>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

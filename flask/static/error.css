@@ -1,0 +1,81 @@
+/* STANDARD STUFF */
+body,
+html {
+  background: none;
+  font-family: Play, sans-serif;
+  font-style: normal;
+
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1920px;
+  max-width: 1080;
+  margin: 0 auto;
+  background: #13151d;
+  user-select: none;
+}
+
+#BG {
+  display: flex;
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+
+/* ERROR CONTAINER */
+.error-container {
+  position: relative;
+  margin: 250px auto 0 auto;
+}
+
+@keyframes hueRotateAnimation {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(300deg);
+  }
+}
+
+.error-container img.error-light-1 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  filter: hue-rotate(300deg);
+  animation: hueRotateAnimation 5s infinite alternate;
+}
+
+.error-container img.error-light-2 {
+  position: fixed;
+  transform: rotate(180deg);
+  bottom: 0;
+  left: 0;
+  filter: hue-rotate(300deg);
+  animation: hueRotateAnimation 5s infinite alternate;
+}
+
+.error-cont-box {
+  justify-content: center;
+  text-align: center;
+  color: #f0f0f0;
+  position: relative;
+  margin: 18% auto 0 auto;
+  max-width: 550px;
+}
+
+.error-cont-box i {
+  font-size: 80px;
+  margin: -10px;
+}
+
+.error-cont-box h1 {
+  text-transform: uppercase;
+  font-family: 'Noto Sans', sans-serif;
+  cursor: pointer;
+  width: 100%;
+  font-size: 52px;
+  font-weight: 600;
+}

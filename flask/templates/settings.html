@@ -1,0 +1,214 @@
+{% extends "layout.html" %}
+
+{% block meta %}
+    <link rel="stylesheet" href="/static/settings.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block content %}
+{% if login %}
+<script type="text/javascript">
+    /* page reload */
+    document.addEventListener('DOMContentLoaded', function() {
+        if(getCookie('session_color') == 'default') return;
+        changeBGColor();
+    });
+
+    /* change the color of the elements */
+    function changeBGColor() {
+        var itemColor = getCookie('session_color');
+        $(".footer-width").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 37) + ')');
+        $(".button-hover").css('background', itemColor);
+        $(".banner-slogan-title").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 47) + ')');
+        $(".banner-slogan-title").css('-webkit-background-clip', 'text');
+        $(".banner-slogan-title").css('-webkit-text-fill-color', 'transparent');
+        $(".rainbow-rad").css('filter', 'hue-rotate(459deg)');
+        document.documentElement.style.setProperty('--nav-a-hover', itemColor);
+        document.documentElement.style.setProperty('--button-hover-bg-1', 'rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.7)');
+        document.documentElement.style.setProperty('--tape-bg', 'linear-gradient(90deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, ' + itemColor + ' 47.62%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 101.59%)');
+        $(".navMenu a.nav-active").css('border-bottom', '3px solid ' + itemColor);
+        $(".login-button-box").css('border', '2px solid ' + itemColor);
+        $(".login-button-box").css('background', +LightenDarkenColor(itemColor, 47));
+        $(".navMenu a.nav-active").css('background', 'linear-gradient(180deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 90%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 100%)');
+        $(".hud-title").css('color', LightenDarkenColor(itemColor, 77));
+        $(".user-button").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 45) + ')');
+    }
+
+    /* rgb functions */
+    function getG(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[2], 16);
+    }
+
+    function getR(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[1], 16);
+    }
+
+    function getB(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return parseInt(result[3], 16);
+    }
+
+    /* method to fade */
+    function LightenDarkenColor(col, amt) {
+        var usePound = false;
+        if (col[0] == "#") {
+          col = col.slice(1);
+          usePound = true;
+        }
+
+        var num = parseInt(col, 16);
+
+        var r = (num >> 16) + amt;
+
+        if (r > 255) r = 255;
+        else if (r < 0) r = 0;
+
+        var b = ((num >> 8) & 0x00FF) + amt;
+
+        if (b > 255) b = 255;
+        else if (b < 0) b = 0;
+
+        var g = (num & 0x0000FF) + amt;
+
+        if (g > 255) g = 255;
+        else if (g < 0) g = 0;
+
+        return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+
+    /* get current coockie (session_code or session_color) */
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+</script>
+
+<section class="settings-page">
+    <div id="BG">
+        <div id="bgdesign" class="main-box">
+            <div class="banner-slogan">
+                <span class="banner-slogan-title">CaseOpening</span>
+                <span class="banner-slogan-subtitle">Gewinne exklusive Fahrzeuge</span>
+            </div>
+
+            <nav class="navMenu">
+                <a href="/spin">Drehen</a>
+                <!--<a href="/shop">Kaufen</a>-->
+                <a href="/history">Überblick</a>
+                <a href="/settings/{{profil_info[0]}}" class="nav-active">{{profil_info[2]}}</a>
+            </nav>
+
+            <div class="structure-line"></div>
+            <div class="player-normalcrates-hud">
+                <span class="player-normalcrates-hud-title">Deine Truhen:</span>
+                <span class="player-normalcrates-hud-subtitle hud-title">{{profil_info[6]}}</span>
+            </div>
+
+            <div class="pw-dialog">
+                <form action="/settings/{{profil_info[0]}}" method="post">
+                    <input type="hidden" name="new_value" value="change_password">
+            
+                    <div class="pw-area">
+                        <div class="pw-area-icon">
+                            <i class="fa fa-unlock"></i>
+                        </div>
+                
+                        <div class="pw-area-input">
+                            <div class="pw-title">Altes Passwort</div>
+                            <input autocomplete="off" type="password" class="pw-area-input-type" name="old-pass" placeholder="***********">
+                        </div>
+                    </div>
+                
+                    <div class="pw-area">
+                        <div class="pw-area-icon">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                
+                        <div class="pw-area-input">
+                            <div class="pw-title">Neues Passwort</div>
+                            <input autocomplete="off" type="password" class="pw-area-input-type" name="new-pass" placeholder="***********">
+                        </div>
+                    </div>
+                
+                    <div class="pw-area">
+                        <div class="pw-area-icon">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                
+                        <div class="pw-area-input">
+                            <div class="pw-title">Neues Passwort Bestätigen</div>
+                            <input autocomplete="off" type="password" class="pw-area-input-type" name="conf-pass" placeholder="***********">
+                        </div>
+                    </div>
+                
+                    <button class="pw-button user-button" value = 'Change Password' type="submit">
+                        <font size="5px">Passwort Ändern</font>
+                    </button>
+                </form>
+            </div>
+
+
+            <div class="displayname-dialog">
+                <form action="/settings/{{profil_info[0]}}" method="post">
+                    <input type="hidden" name="new_value" value="change_displayname">
+            
+                    <div class="displayname-area">
+                        <div class="displayname-area-icon">
+                            <i class="fa fa-pen"></i>
+                        </div>
+                
+                        <div class="displayname-area-input">
+                            <div class="displayname-title">Spitzname</div>
+                            <input autocomplete="off" type="text" class="displayname-area-input-type" name="displayname" placeholder="{{profil_info[2]}}12">
+                        </div>
+                    </div>
+                
+                    <button class="displayname-button user-button" value = 'Edit Displayname' type="submit">
+                        <font size="5px">Name Ändern</font>
+                    </button>
+                </form>
+            </div>
+
+
+            <div class="delac-dialog">
+                <form action="/settings/{{profil_info[0]}}" method="post">
+                    <input type="hidden" name="new_value" value="delete_account">
+            
+                    <div class="delac-area">
+                        <div class="delac-area-icon">
+                            <i class="fa fa-trash"></i>
+                        </div>
+                
+                        <div class="delac-area-input">
+                            <div class="delac-title">Aktuelles Passwort</div>
+                            <input autocomplete="off" type="password" class="delac-area-input-type" name="deleteaccount-password" placeholder="***********">
+                        </div>
+                    </div>
+                
+                    <button class="delac-button user-button" value = 'Delete Displayname' type="submit">
+                        <font size="5px">Account Löschen</font>
+                    </button>
+                </form>
+            </div>
+
+
+            <div class="accountinfo-box">
+                <div class="accountinfo-subcontainer">
+                    <h2>Logins (erfolgreich) | <span>{{profil_info[7]}}</span></h2>
+                    <h2>Logins (erfolglos) | <span>{{profil_info[8]}}</span></h2>
+                    <h2>Erstellt | <span>{{profil_info[4]}}</span></h2>
+                    <h2>Spitzname | <span>{{profil_info[2]}}</span></h2>
+                    <h2>Benutzer | <span>{{profil_info[1]}}</span></h2>
+                    <h2>Gespielt | <span>{{total_count}}</span></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

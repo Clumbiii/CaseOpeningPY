@@ -1,0 +1,689 @@
+{% extends "layout.html" %}
+
+{% block meta %}
+  <link rel="stylesheet" href="/static/spin.css" />
+  <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+
+{% if login %}
+<script type="text/javascript">
+  /* spin: variables */
+  var spinTypes = [
+    { name: "Standard", chance: 60.00, class: "very-high" },
+    { name: "Ungewöhnlich", chance: 15.00, class: "high" },
+    { name: "Selten", chance: 10.00, class: "mid" },
+    { name: "Episch", chance: 10.00, class: "low" },
+    { name: "Legendär", chance: 5.00, class: "very-low" }
+  ];
+
+  var spinCards = [
+    {
+      rarity: "Standard", spinCards: [
+        { speed: 351, model: "Aventador", Exklusiv: false, imageUrl: 'https://i.postimg.cc/kR2Sn11J/aventador-red.png', threadColor: '#f01a1a' },
+        { speed: 290, model: "Benz-S", Exklusiv: false, imageUrl: 'https://i.postimg.cc/xqZHsQ8c/benz-s-black.png', threadColor: '#750ced' },
+        { speed: 250, model: "BMW M3", Exklusiv: false, imageUrl: 'https://i.postimg.cc/jC2PQ2sp/bmwm3-yellow.png', threadColor: '#f2b40a' },
+      ]
+    },
+    {
+      rarity: "Ungewöhnlich", spinCards: [
+        { speed: 340, model: "Ferrari 488", Exklusiv: false, imageUrl: 'https://i.postimg.cc/VJQt8Fjw/ferrari-488-red.png', threadColor: '#fa5757' },
+        { speed: 200, model: "Fort Mustang", Exklusiv: true, imageUrl: 'https://i.postimg.cc/LqmZq6C0/ford-mustang-2018-black.png', threadColor: '#0fedf5' },
+        { speed: 200, model: "Kiss City Green", Exklusiv: false, imageUrl: 'https://i.postimg.cc/7fTzdRJX/kiss-city-green.png', threadColor: '#37e607' },
+        { speed: 320, model: "Maserati", Exklusiv: false, imageUrl: 'https://i.postimg.cc/K1PMvgNM/maserati-sport-red.png', threadColor: '#eb107d' },
+      ]
+    },
+    {
+      rarity: "Selten", spinCards: [
+        { speed: 328, model: "McLaren", Exklusiv: false, imageUrl: 'https://i.postimg.cc/34R4BfHX/mclaren-blue.png', threadColor: '#3d5ddb' },
+        { speed: 115, model: "Oldheimer", Exklusiv: false, imageUrl: 'https://i.postimg.cc/d7nZGPgQ/old-car-green.png', threadColor: '#64de97' },
+      ]
+    },
+    {
+      rarity: "Episch", spinCards: [
+        { speed: 250, model: "Range Rover", Exklusiv: false, imageUrl: 'https://i.postimg.cc/sQNB0PVt/range-rover-orange.png', threadColor: '#f77d02' },
+      ]
+    },
+    {
+      rarity: "Legendär", spinCards: [
+        { speed: 262, model: "Tesla X", Exklusiv: false, imageUrl: 'https://i.postimg.cc/XXrBBPL3/tesla-x-white.png', threadColor: '#dbdbdb' },
+        { speed: 177, model: "Toyota Dodge", Exklusiv: false, imageUrl: 'https://i.postimg.cc/HjFcwtvM/toyota-dodge-aqua.png', threadColor: '#42c0c9' },
+      ]
+    },
+  ];
+
+  var tempItemName;
+  var tempItemColor;
+  var tempItemRarity;
+  var winningColor = '#fff';
+  var currentWinningCardNumber = 0;
+  var cardsAmountGeneral = 200;
+
+  /* particles: variables */
+  var startConfetti;
+  var stopConfetti;
+  var toggleConfetti;
+  var removeConfetti;
+  var maxParticleCount = 150;
+  var particleSpeed = 2;
+  var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"]
+  var streamingConfetti = false;
+  var animationTimer = null;
+  var particles = [];
+  var waveAngle = 0;
+
+  /* particles: init variables */
+  startConfetti = startConfettiInner;
+  stopConfetti = stopConfettiInner;
+  toggleConfetti = toggleConfettiInner;
+  removeConfetti = removeConfettiInner;
+
+
+  /* page reload */
+  document.addEventListener('DOMContentLoaded', function () {
+    if (getCookie('session_color') == 'default') return;
+    changeBGColorOnStart();
+  });
+
+  /* change the color of the elements */
+  function changeBGColorOnStart() {
+    var itemColor = getCookie('session_color');
+
+    $(".footer-width").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 37) + ')');
+    $(".button-hover").css('background', itemColor);
+    $(".banner-slogan-title").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 47) + ')');
+    $(".banner-slogan-title").css('-webkit-background-clip', 'text');
+    $(".banner-slogan-title").css('-webkit-text-fill-color', 'transparent');
+    $(".rainbow-rad").css('filter', 'hue-rotate(459deg)');
+    document.documentElement.style.setProperty('--nav-a-hover', itemColor);
+    document.documentElement.style.setProperty('--button-hover-bg-1', 'rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.7)');
+    document.documentElement.style.setProperty('--tape-bg', 'linear-gradient(90deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, ' + itemColor + ' 47.62%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 101.59%)');
+    $(".navMenu a.nav-active").css('border-bottom', '3px solid ' + itemColor);
+    $(".login-button-box").css('border', '2px solid ' + itemColor);
+    $(".login-button-box").css('background', +LightenDarkenColor(itemColor, 47));
+    $(".navMenu a.nav-active").css('background', 'linear-gradient(180deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 90%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 100%)');
+    $(".hud-title").css('color', LightenDarkenColor(itemColor, 77));
+  }
+
+  /* rgb functions */
+  function getG(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return parseInt(result[2], 16);
+  }
+
+  function getR(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return parseInt(result[1], 16);
+  }
+
+  function getB(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return parseInt(result[3], 16);
+  }
+
+  /* method to fade */
+  function LightenDarkenColor(col, amt) {
+    var usePound = false;
+    if (col[0] == "#") {
+      col = col.slice(1);
+      usePound = true;
+    }
+
+    var num = parseInt(col, 16);
+
+    var r = (num >> 16) + amt;
+
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
+
+    var b = ((num >> 8) & 0x00FF) + amt;
+
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
+
+    var g = (num & 0x0000FF) + amt;
+
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+
+    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+  }
+
+  /* get current coockie (session_code or session_color) */
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
+  /* particles: clear function */
+  function resetParticle(particle, width, height) {
+    particle.color = colors[(Math.random() * colors.length) | 0];
+    particle.x = Math.random() * width;
+    particle.y = Math.random() * height - height;
+    particle.diameter = Math.random() * 10 + 5;
+    particle.tilt = Math.random() * 10 - 10;
+    particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
+    particle.tiltAngle = 0;
+    return particle;
+  }
+
+  /* particles: start function */
+  function startConfettiInner() {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+          return window.setTimeout(callback, 16.6666667);
+        };
+    })();
+    var canvas = document.getElementById("confetti-canvas");
+    if (canvas === null) {
+      canvas = document.createElement("canvas");
+      canvas.setAttribute("id", "confetti-canvas");
+      canvas.setAttribute("style", "display:block;z-index:999999;pointer-events:none");
+      document.body.appendChild(canvas);
+      canvas.width = width;
+      canvas.height = height;
+      window.addEventListener("resize", function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }, true);
+    }
+    var context = canvas.getContext("2d");
+    while (particles.length < maxParticleCount)
+      particles.push(resetParticle({}, width, height));
+    streamingConfetti = true;
+    if (animationTimer === null) {
+      (function runAnimation() {
+        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        if (particles.length === 0)
+          animationTimer = null;
+        else {
+          updateParticles();
+          drawParticles(context);
+          animationTimer = requestAnimFrame(runAnimation);
+        }
+      })();
+    }
+  }
+
+  /* particles: stop function */
+  function stopConfettiInner() {
+    streamingConfetti = false;
+  }
+
+  /* particles: remove function */
+  function removeConfettiInner() {
+    stopConfetti();
+    particles = [];
+  }
+
+  /* particles: toggle function */
+  function toggleConfettiInner() {
+    if (streamingConfetti)
+      stopConfettiInner();
+    else
+      startConfettiInner();
+  }
+
+  /* particles: draw function */
+  function drawParticles(context) {
+    var particle;
+    var x;
+    for (var i = 0; i < particles.length; i++) {
+      particle = particles[i];
+      context.beginPath();
+      context.lineWidth = particle.diameter;
+      context.strokeStyle = particle.color;
+      x = particle.x + particle.tilt;
+      context.moveTo(x + particle.diameter / 2, particle.y);
+      context.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
+      context.stroke();
+    }
+  }
+
+  /* particles: scale function */
+  function updateParticles() {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    var particle;
+    waveAngle += 0.01;
+    for (var i = 0; i < particles.length; i++) {
+      particle = particles[i];
+      if (!streamingConfetti && particle.y < -15)
+        particle.y = height + 100;
+      else {
+        particle.tiltAngle += particle.tiltAngleIncrement;
+        particle.x += Math.sin(waveAngle);
+        particle.y += (Math.cos(waveAngle) + particle.diameter + particleSpeed) * 0.5;
+        particle.tilt = Math.sin(particle.tiltAngle) * 15;
+      }
+      if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
+        if (streamingConfetti && particles.length <= maxParticleCount)
+          resetParticle(particle, width, height);
+        else {
+          particles.splice(i, 1);
+          i--;
+        }
+      }
+    }
+  }
+
+  /* spin: document object model */
+  $(document).ready(function () {
+    /* play a sound */
+    function playSoundEffect(soundURL) {
+      var audio = new Audio(soundURL);
+      audio.volume = 0.7;
+      audio.play();
+
+      /*
+      https://drive.google.com/uc?id=1qpca58KYHVyXAWa-TmidxNs-Q9nYS6lE (won1)
+      https://drive.google.com/uc?id=1_kuOzlhUvW3z6lQyuU8mRkkYgZKeKaKh (won2)
+      https://drive.google.com/uc?id=1PxWa-EDj4xnqEwiWVDRK-rAcnZUB9bUI (won3)
+      https://drive.google.com/uc?id=1QSdhsM7PslJDaZI8c892d5czmITgpNax (click)
+      https://drive.google.com/uc?id=1r5VjWuwScMdUZWhYTI7OgroKaZOO7aVJ (click_button)
+      https://drive.google.com/uc?id=18IS7cnvrxRUgIrIYRg03clRNeSdzob0o (refresh_cards)
+      */
+    }
+
+    /* spin: spin button click */
+    $(".spin-button").click(function () {
+      if ($(".button-hover").hasClass('disabled')) return;
+      if ($(".navMenu a").hasClass('disabled')) return;
+
+      playSoundEffect("https://drive.google.com/uc?id=1r5VjWuwScMdUZWhYTI7OgroKaZOO7aVJ")
+
+      var card = $(".slider ul li");
+      var cardSize = 250;
+      var marginSize = 24;
+      var winningCardNumber = 58;
+      $('ul li:nth-child(' + winningCardNumber + ')').addClass('winning-card');
+      $("ul li:nth-child(" + (winningCardNumber - 2) + ")").addClass('surrounding-winning-card');
+      $("ul li:nth-child(" + (winningCardNumber - 1) + ")").addClass('surrounding-winning-card');
+      $("ul li:nth-child(" + (winningCardNumber + 1) + ")").addClass('surrounding-winning-card');
+      $("ul li:nth-child(" + (winningCardNumber + 2) + ")").addClass('surrounding-winning-card');
+      var startOfWinningCard = -Math.abs(((cardSize / 2) + marginSize) + ((cardSize + marginSize) * (winningCardNumber - 4))) - (cardSize / 2);
+      var centerOfWinningCard = startOfWinningCard - cardSize / 2;
+      var numberRand = (Math.floor(Math.random() * 250) + 1);
+      var totalTranslate = startOfWinningCard - numberRand;
+      var animationTime = 15000;
+
+      card.css('transition', 'all ' + animationTime + 'ms cubic-bezier(.09,.08,.1,.99');
+      card.css('transform', 'translateX(' + totalTranslate + 'px) rotate3d(0,0,0, 0deg');
+
+      setTimeout(() => { finishedSliding(centerOfWinningCard, card, winningCardNumber) }, animationTime + 500);
+
+      setTimeout(() => { playSoundEffect("https://drive.google.com/uc?id=1_kuOzlhUvW3z6lQyuU8mRkkYgZKeKaKh") }, animationTime - 1200);
+
+      currentWinningCardNumber = centerOfWinningCard;
+
+      $(".button-hover").addClass('disabled');
+      $(".navMenu a").addClass('disabled');
+      //$(".navMenu a").fadeOut();
+
+      setTimeout(() => {
+        document.documentElement.style.setProperty('--button-hover-animation', 'xpulse-new-203c708d 2s infinite');
+      }, 2000)
+    });
+
+    /* spin: sliding has finished */
+    function finishedSliding(centerOfWinningCard, card, winningCardNumber) {
+      card.css('transition', 'all 300ms');
+      card.css('transform', 'translateX(' + centerOfWinningCard + 'px) scale(1) rotate3d(0,0,0, 0deg');
+      setTimeout(() => { playSoundEffect("https://drive.google.com/uc?id=1qpca58KYHVyXAWa-TmidxNs-Q9nYS6lE") }, 500);
+      setTimeout(() => { popUpItem(centerOfWinningCard) }, 1000);
+    }
+
+    /* spin: popup won card */
+    function popUpItem(centerOfWinningCard) {
+      var winningCard = $(".winning-card")
+      $(".won-item-focus").fadeOut();
+      $(".middle").css('display', 'none');
+
+      startConfetti();
+
+      $(".rainbow-rad").fadeIn();
+
+      /* spin: add history entry */
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/add_history', true);
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          console.log('added history log');
+        }
+      };
+      xhr.send(JSON.stringify({
+        wonrarity: tempItemRarity,
+        wonname: tempItemName,
+        wondisplay: tempItemName,
+        woncolor: tempItemColor
+      }));
+
+      changeBGColor(winningColor)
+
+      winningCard.css('transition', 'all 300ms');
+      winningCard.css('transform', 'translateX(' + centerOfWinningCard + 'px) scale(1.065) rotate3d(1,0,1, 360deg');
+      $(".surrounding-winning-card").css('opacity', '.3');
+
+      setTimeout(() => {
+        $(".rainbow-rad").fadeOut();
+      }, 4000)
+
+      setTimeout(() => {
+        stopConfetti();
+
+        againSlider(spinCards);
+
+        document.documentElement.style.setProperty('--button-hover-animation', 'pulse-new-203c708d 2s infinite');
+      }, 5000);
+    }
+
+    /* spin: reset spinning */
+    function resetSlider() {
+      var card = $(".slider ul li");
+      $(".middle").css('display', '');
+      card.css('transition', 'none');
+      card.css('transform', 'translateX(-125px)');
+    }
+
+    /* change the color of the elements manually */
+    function changeBGColor(itemColor) {
+      $(".footer-width").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 37) + ')');
+      $(".button-hover").css('background', itemColor);
+      $(".banner-slogan-title").css('background', 'linear-gradient(90deg,' + itemColor + ', ' + LightenDarkenColor(itemColor, 47) + ')');
+      $(".banner-slogan-title").css('-webkit-background-clip', 'text');
+      $(".banner-slogan-title").css('-webkit-text-fill-color', 'transparent');
+      $(".rainbow-rad").css('filter', 'hue-rotate(459deg)');
+      document.documentElement.style.setProperty('--nav-a-hover', itemColor);
+      document.documentElement.style.setProperty('--button-hover-bg-1', 'rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.7)');
+      document.documentElement.style.setProperty('--tape-bg', 'linear-gradient(90deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, ' + itemColor + ' 47.62%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 101.59%)');
+      $(".navMenu a.nav-active").css('border-bottom', '3px solid ' + itemColor);
+      $(".login-button-box").css('border', '2px solid ' + itemColor);
+      $(".login-button-box").css('background', +LightenDarkenColor(itemColor, 47));
+      $(".navMenu a.nav-active").css('background', 'linear-gradient(180deg, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0) 0%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 90%, rgba(' + getR(itemColor) + ', ' + getG(itemColor) + ', ' + getB(itemColor) + ', 0.31) 100%)');
+      $(".hud-title").css('color', LightenDarkenColor(itemColor, 77));
+    }
+
+    /* rgb functions */
+    function getG(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return parseInt(result[2], 16);
+    }
+
+    function getR(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return parseInt(result[1], 16);
+    }
+
+    function getB(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return parseInt(result[3], 16);
+    }
+
+    /* hex to rgb function */
+    function hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+
+    /* method to fade */
+    function LightenDarkenColor(col, amt) {
+      var usePound = false;
+      if (col[0] == "#") {
+        col = col.slice(1);
+        usePound = true;
+      }
+
+      var num = parseInt(col, 16);
+
+      var r = (num >> 16) + amt;
+
+      if (r > 255) r = 255;
+      else if (r < 0) r = 0;
+
+      var b = ((num >> 8) & 0x00FF) + amt;
+
+      if (b > 255) b = 255;
+      else if (b < 0) b = 0;
+
+      var g = (num & 0x0000FF) + amt;
+
+      if (g > 255) g = 255;
+      else if (g < 0) g = 0;
+
+      return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+
+    /* fill spin with cards */
+    function fillSlider(caseData) {
+      resetSlider();
+
+      var cards = [];
+      var startItem = 0;
+      var totalCardsAmount = cardsAmountGeneral;
+
+      fillCards(caseData, cards, totalCardsAmount, startItem);
+
+      $(".slider > ul").html(cards);
+    }
+
+    /* fill spin with cards again */
+    function againSlider(caseData) {
+      $(".slider").fadeOut();
+
+      setTimeout(() => {
+        resetSlider();
+
+        playSoundEffect("https://drive.google.com/uc?id=18IS7cnvrxRUgIrIYRg03clRNeSdzob0o");
+      }, 500)
+
+      setTimeout(() => {
+        $(".slider").fadeIn();
+        var cards = [];
+        var startItem = 0;
+        var totalCardsAmount = cardsAmountGeneral;
+        fillCards(caseData, cards, totalCardsAmount, startItem);
+        $(".slider > ul").html(cards);
+
+        $(".won-item-focus").fadeIn();
+
+        $(".button-hover").removeClass('disabled');
+        $(".navMenu a").removeClass('disabled');
+        //$(".navMenu a").fadeIn();
+      }, 2000)
+    }
+
+    /* method to get the rarity from a model */
+    function getRarityForModel(modelName) {
+      for (let i = 0; i < spinCards.length; i++) {
+        const spinCardCategory = spinCards[i];
+        const spinCardsInCategory = spinCardCategory.spinCards;
+
+        for (let j = 0; j < spinCardsInCategory.length; j++) {
+          const spinCard = spinCardsInCategory[j];
+
+          if (spinCard.model === modelName) {
+            return spinCardCategory.rarity;
+          }
+        }
+      }
+      return null;
+    }
+
+    /* method for fillSlider() */
+    function fillCards(caseData, cards, totalCardsAmount, startItem) {
+      if (startItem >= totalCardsAmount) return cards;
+
+      var chosenItem;
+      var itemRarity;
+      var previousChance;
+      var itemTolua;
+      var whatItem;
+      var finalorder;
+      var randomNumber = parseFloat(Math.random() * 100).toFixed(2);
+      var cardFound = false;
+      var counter = 0
+
+      for (k = 0; k < spinTypes.length; k++) {
+        if (k === 0) {
+          previousChance = 0;
+          currentChance = spinTypes[k].chance;
+        } else {
+          previousChance = previousChance + spinTypes[k - 1].chance;
+          currentChance = spinTypes[k].chance + previousChance;
+        }
+
+        if (randomNumber <= currentChance && randomNumber > previousChance) {
+
+          var allItemsOfType = caseData.find(item => item.rarity == spinTypes[k].name)
+
+          if (allItemsOfType != null) {
+            allItemsOfType = allItemsOfType.spinCards
+            chosenItem = allItemsOfType[Math.floor(Math.random() * allItemsOfType.length)];
+
+            /* win slot: 57 */
+            if (startItem == 57) {
+              tempItemName = Object.values(chosenItem)[1];
+              tempItemColor = Object.values(chosenItem)[4];
+              tempItemRarity = getRarityForModel(Object.values(chosenItem)[1]) 
+
+              setTimeout(() => {
+                winningColor = tempItemColor;
+              }, 1000)
+            }
+
+            /* display "Exklusive" or not */
+            itemRarity = spinTypes[k].class;
+            var statTrakClass = "no-exklusiv";
+            if (chosenItem.Exklusiv === true) {
+              statTrakClass = "exklusiv"
+            }
+
+
+            /* add all cards to list */
+            cards.push(`
+            <li class="`+ itemRarity + `">
+              <div class="absolute" style="background: linear-gradient(0deg, rgba(`+ getR(chosenItem.threadColor) + `, ` + getG(chosenItem.threadColor) + `, ` + getB(chosenItem.threadColor) + `, 0) 0%, rgba(` + getR(chosenItem.threadColor) + `, ` + getG(chosenItem.threadColor) + `, ` + getB(chosenItem.threadColor) + `, 0.094) 90%, rgba(` + getR(chosenItem.threadColor) + `, ` + getG(chosenItem.threadColor) + `, ` + getB(chosenItem.threadColor) + `, 0.212) 100%);">
+                <div class="absolute-border" style="background: `+ chosenItem.threadColor + `;">
+
+                </div>
+
+                <div class="item-details">
+                  <span class="item-detail ` + statTrakClass + `">Exklusiv</span>
+                </div>
+              </div>
+              <img src="` + chosenItem.imageUrl + `" >
+              <span class="cover">
+                <span class="centered">` + chosenItem.speed + ` km/h</span>
+                <span class="centered2">` + chosenItem.model + `</span>
+              </span>
+            </li>`);
+            k = spinTypes.length;
+          }
+        }
+      }
+
+      startItem++;
+      fillCards(caseData, cards, totalCardsAmount, startItem)
+    }
+
+    /* fill caseopening on page load */
+    fillSlider(spinCards);
+
+    /* mix an array */
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+      while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+  });
+</script>
+
+
+<section class="spin-page">
+  <div class="rainbow-rad">
+
+  </div>
+
+  <div id="BG">
+    <div id="bgdesign" class="main-box">
+      <div class="banner-slogan">
+        <span class="banner-slogan-title">CaseOpening</span>
+        <span class="banner-slogan-subtitle">Gewinne exklusive Fahrzeuge</span>
+      </div>
+
+      <nav class="navMenu">
+        <a href="/spin" class="nav-active">Drehen</a>
+        <!--<a href="/shop">Kaufen</a>-->
+        <a href="/history">Überblick</a>
+        <a href="/settings/{{profil_info[0]}}">{{profil_info[2]}}</a>
+      </nav>
+
+      <div class="structure-line"></div>
+      <div class="player-normalcrates-hud">
+        <span class="player-normalcrates-hud-title">Deine Truhen:</span>
+        <span class="player-normalcrates-hud-subtitle hud-title">{{profil_info[6]}}</span>
+      </div>
+
+      <div id="border">
+        <div class="container">
+
+          <div class="tape-first" id="tape"></div>
+          <div class="won-item-focus">
+
+          </div> <!-- class="not-focus" -->
+
+          <div class="viewport">
+            <!-- <div class="middle"></div>-->
+            <div class="overlay"></div>
+            <div class="slider">
+              <ul>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tape-second" id="tape"></div>
+
+
+          {% if profil_info[6] >= 1 %}
+          <div class="buttons">
+
+            <button class="button-hover spin-button">
+              <span>
+                <span>
+                  KLICKEN ZUM SPINNEN
+                </span>
+              </span>
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+</section>
+{% endif %}
+
+
+{% endblock %}

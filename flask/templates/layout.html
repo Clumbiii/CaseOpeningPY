@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CaseOpening</title>
+        <link rel="stylesheet" href="/static/layout.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        {% block meta %}
+        {% endblock %}
+    </head>
+
+    <body>
+        <header>
+            <div id="container" class="layout-container">
+                {% if login %}
+                    <div class="login-button-box">
+                        <a href="/logout">Ausloggen</a>
+                    </div>
+                {% else %}
+                    <div class="login-button-box">
+                        <a href="/login">Einloggen</a>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+        <div id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+
+</html>

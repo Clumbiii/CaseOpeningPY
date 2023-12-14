@@ -1,0 +1,2 @@
+INSERT INTO `users` (`ID`, `Username`, `Displayname`, `UserID`, `Created`, `PasswordHash`, `Cases`, `Logins`, `FailedLogins`) VALUES
+(1, 'demo', 'Dämo', 1, '04.12.2023', '9de30d3425a9301c48409960da207567a971cdd8da7dea51f5580ce3c09ccd026e58a5778c506e0a77508592de2effc5b2cbc9eddd91341ae83609edcfa58a8e', 15, 0, 0);
